@@ -70,13 +70,13 @@ void		glxtLookAt		(float eye_x, float eye_y, float eye_z, float center_x, float 
 
 	// OpenGL
 	glMultMatrixf	(matrix);
-	glTranslated	(-eye_x, -eye_y, -eye_z);
+	glTranslatef	(-eye_x, -eye_y, -eye_z);
 }
 
 // Расширение (аналог gluPerspective)
 void		glxtPerspective	(float fov_y, float aspect_ratio, float near_plane, float far_plane)
 {
-	if (fov_y <= 0.f || aspect_ratio <= 0.f || far_plane - near_plane <= 0.f)
+	if (fov_y <= 0.f || aspect_ratio <= 0.f || near_plane <= 0.f || far_plane <= 0.f || far_plane - near_plane <= 0.f)
 		return;
 
 	float height	= (float)tan(fov_y * pi / 360.f) * near_plane;
