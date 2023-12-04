@@ -10,7 +10,7 @@
 
 #include <math.h>
 
-#if defined(_WIN32_)
+#if defined(WIN32)
 #include <windows.h>
 #endif
 
@@ -19,69 +19,92 @@
 #include "glxt.h"
 
 // Константы
-static const float pi = 3.14159265358979323846264338327950f;
+static const double pi = 3.14159265358979323846264338327950;
+
+typedef struct
+{
+	double x, y, z;
+}
+Vector3d;
+
+// Конвертеры
+static double	rad2deg			(double val)	// Радианы в градусы
+{
+	return val * 180.0 / pi;
+}
+
+static double	deg2rad			(double val)	// Градусы в радианы
+{
+	return val * pi / 180.0;
+}
 
 // Нормализация вектора
-static void	normalize		(float vec[3])
+static void	normalize		(Vector3d* vec)
 {
-	float len = (float)sqrt(vec[0] * vec[0] + vec[1] * vec[1] + vec[2] * vec[2]);
+	double len = sqrt(vec->x * vec->x + vec->y * vec->y + vec->z * vec->z);
 
-	if (len == 0.f)
+	// Проверка на ноль
+	if (len == 0.0)
 		return;
 
-	vec[0] /= len;
-	vec[1] /= len;
-	vec[2] /= len;
+	vec->x /= len;
+	vec->y /= len;
+	vec->z /= len;
 }
 
 // Векторное произведение двух векторов
-static void	cross			(float vec1[3], float vec2[3], float res[3])
+static void	cross			(Vector3d* vec1, Vector3d* vec2, Vector3d* res)
 {
-	res[0] = vec1[1] * vec2[2] - vec1[2] * vec2[1];
-	res[1] = vec1[2] * vec2[0] - vec1[0] * vec2[2];
-	res[2] = vec1[0] * vec2[1] - vec1[1] * vec2[0];
+	res->x = vec1->y * vec2->z - vec1->z * vec2->y;
+	res->y = vec1->z * vec2->x - vec1->x * vec2->z;
+	res->z = vec1->x * vec2->y - vec1->y * vec2->x;
 }
 
 // Расширение (аналог gluLookAt)
-void		glxtLookAt		(float eye_x, float eye_y, float eye_z, float center_x, float center_y, float center_z, float up_x, float up_y, float up_z)
+void		glxtLookAt		(double eye_x, double eye_y, double eye_z, double center_x, double center_y, double center_z, double up_x, double up_y, double up_z)
 {
-	float forward[3], up[3], side[3];
+	Vector3d forward, side, up;
 
-	forward[0]		= center_x - eye_x;
-	forward[1]		= center_y - eye_y;
-	forward[2]		= center_z - eye_z;
+	up.x			= up_x;
+	up.y			= up_y;
+	up.z			= up_z;
 
-	up[0]			= up_x;
-	up[1]			= up_y;
-	up[2]			= up_z;
+	// Расчет и нормализация вектора направления (forward)
+	forward.x		= center_x - eye_x;
+	forward.y		= center_y - eye_y;
+	forward.z		= center_z - eye_z;
+	normalize		(&forward);
 
-	normalize		(forward);
-	cross			(forward, up, side);
-	normalize		(side);
-	cross			(side, forward, up);
+	// Расчет и нормализация бокового вектора (side)
+	cross			(&forward, &up, &side);
+	normalize		(&side);
 
-	float matrix[16] =
+	// Расчет вектора вверх (up)
+	cross			(&side, &forward, &up);
+
+	// Создание матрицы преобразования
+	double matrix[16] =
 	{
-		side[0],	up[0],	-forward[0],	0.f,
-		side[1],	up[1],	-forward[1],	0.f,
-		side[2],	up[2],	-forward[2],	0.f,
-		0.f,		0.f,	0.f,			1.f
+		side.x,	up.x,	-forward.x,	0.0,
+		side.y,	up.y,	-forward.y,	0.0,
+		side.z,	up.z,	-forward.z,	0.0,
+		0.0,	0.0,	0.0,		1.0
 	};
 
-	// OpenGL
-	glMultMatrixf	(matrix);
-	glTranslatef	(-eye_x, -eye_y, -eye_z);
+	// Загрузка в OpenGL
+	glMultMatrixd	(matrix);
+	glTranslated	(-eye_x, -eye_y, -eye_z);
 }
 
 // Расширение (аналог gluPerspective)
-void		glxtPerspective	(float fov_y, float aspect_ratio, float near_plane, float far_plane)
+void		glxtPerspective	(double fov_y, double aspect_ratio, double near_plane, double far_plane)
 {
-	if (fov_y <= 0.f || aspect_ratio <= 0.f || near_plane <= 0.f || far_plane <= 0.f || far_plane - near_plane <= 0.f)
+	if (fov_y <= 0.0 || aspect_ratio <= 0.0 || near_plane <= 0.0 || far_plane <= 0.0 || far_plane - near_plane <= 0.0)
 		return;
 
-	float height	= (float)tan(fov_y * pi / 360.f) * near_plane;
-	float width		= height * aspect_ratio;
+	double height	= tan(deg2rad(fov_y / 2.0)) * near_plane;
+	double width	= height * aspect_ratio;
 
-	// OpenGL
+	// Загрузка в OpenGL
 	glFrustum		(-width, width, -height, height, near_plane, far_plane);
 }

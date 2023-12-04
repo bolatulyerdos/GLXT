@@ -16,10 +16,10 @@ extern "C" {
 #endif
 
 // Расширение (аналог gluLookAt)
-void		glxtLookAt		(float eye_x, float eye_y, float eye_z, float center_x, float center_y, float center_z, float up_x, float up_y, float up_z);
+void		glxtLookAt		(double eye_x, double eye_y, double eye_z, double center_x, double center_y, double center_z, double up_x, double up_y, double up_z);
 
 // Расширение (аналог gluPerspective)
-void		glxtPerspective	(float fov_y, float aspect_ratio, float near_plane, float far_plane);
+void		glxtPerspective	(double fov_y, double aspect_ratio, double near_plane, double far_plane);
 
 #ifdef __cplusplus
 }
