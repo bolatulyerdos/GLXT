@@ -2,9 +2,9 @@
 	================================================================
 	File name	: glxt.с
 	Created		: 01.10.2023
-	Modified	: 01.10.2023
+	Modified	: 04.12.2023
 	Author		: bolatulyerdos
-	Description	: OpenGL Extensions (GLXT)
+	Description	: OpenGL Extensions (GLXT) implementation
 	================================================================
 */
 
@@ -39,7 +39,7 @@ static double	deg2rad			(double val)	// Градусы в радианы
 }
 
 // Нормализация вектора
-static void	normalize		(Vector3d* vec)
+static void		normalize		(Vector3d* vec)
 {
 	double len = sqrt(vec->x * vec->x + vec->y * vec->y + vec->z * vec->z);
 
@@ -53,7 +53,7 @@ static void	normalize		(Vector3d* vec)
 }
 
 // Векторное произведение двух векторов
-static void	cross			(Vector3d* vec1, Vector3d* vec2, Vector3d* res)
+static void		cross			(Vector3d* vec1, Vector3d* vec2, Vector3d* res)
 {
 	res->x = vec1->y * vec2->z - vec1->z * vec2->y;
 	res->y = vec1->z * vec2->x - vec1->x * vec2->z;
@@ -61,7 +61,7 @@ static void	cross			(Vector3d* vec1, Vector3d* vec2, Vector3d* res)
 }
 
 // Расширение (аналог gluLookAt)
-void		glxtLookAt		(double eye_x, double eye_y, double eye_z, double center_x, double center_y, double center_z, double up_x, double up_y, double up_z)
+void			glxtLookAt		(double eye_x, double eye_y, double eye_z, double center_x, double center_y, double center_z, double up_x, double up_y, double up_z)
 {
 	Vector3d forward, side, up;
 
@@ -97,7 +97,7 @@ void		glxtLookAt		(double eye_x, double eye_y, double eye_z, double center_x, do
 }
 
 // Расширение (аналог gluPerspective)
-void		glxtPerspective	(double fov_y, double aspect_ratio, double near_plane, double far_plane)
+void			glxtPerspective	(double fov_y, double aspect_ratio, double near_plane, double far_plane)
 {
 	if (fov_y <= 0.0 || aspect_ratio <= 0.0 || near_plane <= 0.0 || far_plane <= 0.0 || far_plane - near_plane <= 0.0)
 		return;
